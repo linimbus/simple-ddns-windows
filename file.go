@@ -1,14 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
+
+	"github.com/jeessy2/ddns-go/v6/util"
 )
 
 var DEFAULT_HOME string
 
 func RunlogDirGet() string {
-	dir := fmt.Sprintf("%s\\runlog", DEFAULT_HOME)
+	dir := filepath.Join(DEFAULT_HOME, "runlog")
 	_, err := os.Stat(dir)
 	if err != nil {
 		os.MkdirAll(dir, 0644)
@@ -17,12 +19,16 @@ func RunlogDirGet() string {
 }
 
 func ConfigDirGet() string {
-	dir := fmt.Sprintf("%s\\config", DEFAULT_HOME)
+	dir := filepath.Join(DEFAULT_HOME, "config")
 	_, err := os.Stat(dir)
 	if err != nil {
 		os.MkdirAll(dir, 0644)
 	}
 	return dir
+}
+
+func DDNSDirSet() {
+	os.Setenv(util.ConfigFilePathENV, filepath.Join(ConfigDirGet(), "ddns_default.yaml"))
 }
 
 func appDataDir() string {
@@ -33,7 +39,7 @@ func appDataDir() string {
 	if datadir == "" {
 		datadir = ".\\"
 	} else {
-		datadir = fmt.Sprintf("%s\\SimpleDDNSWindows", datadir)
+		datadir = filepath.Join(datadir, "SimpleDDNSWindows")
 	}
 	return datadir
 }
@@ -45,4 +51,5 @@ func FileInit() {
 		os.MkdirAll(dir, 0644)
 	}
 	DEFAULT_HOME = dir
+	DDNSDirSet()
 }
