@@ -13,9 +13,10 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/logs"
-	"github.com/jeessy2/ddns-go/v6/config"
-	"github.com/jeessy2/ddns-go/v6/dns"
-	"github.com/jeessy2/ddns-go/v6/util"
+	"github.com/linimbus/simple-ddns-windows/config"
+	dns "github.com/linimbus/simple-ddns-windows/ddns"
+	"github.com/linimbus/simple-ddns-windows/util"
+
 	"github.com/lxn/walk"
 )
 

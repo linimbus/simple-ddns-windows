@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jeessy2/ddns-go/v6/util"
+	"github.com/linimbus/simple-ddns-windows/util"
 )
 
 var DEFAULT_HOME string
