@@ -23,7 +23,7 @@ func AboutAction() {
 
 	_, err = Dialog{
 		AssignTo:      &about,
-		Title:         "Sponsor",
+		Title:         "About",
 		Icon:          walk.IconInformation(),
 		MinSize:       Size{Width: 200, Height: 200},
 		DefaultButton: &ok,
@@ -52,6 +52,6 @@ func AboutAction() {
 	}.Run(mainWindow)
 
 	if err != nil {
-		logs.Error(err.Error())
+		logs.Error("run about dialog fail, %s", err.Error())
 	}
 }

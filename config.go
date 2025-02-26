@@ -2,31 +2,61 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/astaxie/beego/logs"
 )
 
+type ProxyConfig struct {
+	Enable   bool   `json:"enable"`
+	Address  string `json:"address"`
+	Port     int    `json:"port"`
+	Protocol string `json:"protocol"`
+	Auth     bool   `json:"auth"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
+
+type DomainConfig struct {
+	Enable          bool   `json:"enable"`
+	IPv6            bool   `json:"ipv6"`
+	GenerateType    string `json:"generate_type"`
+	ConnectivityURL string `json:"connectivity_url"`
+	NetInterface    string `json:"network_interface"`
+	ScriptCommand   string `json:"script_command"`
+	FilterRegexp    string `json:"filter_regexp"`
+	DomainName      string `json:"domain_name"`
+	SubDomain       string `json:"sub_domain"`
+	CustomParams    string `json:"custom_params"`
+}
+
+type ProviderConfig struct {
+	Enable  bool           `json:"enable"`
+	Name    string         `json:"name"`
+	Key     string         `json:"key"`
+	Secret  string         `json:"sercet"`
+	TTL     int            `json:"ttl"`
+	Domains []DomainConfig `json:"domains"`
+}
+
 type Config struct {
-	ConnectivityURL string
-	FilterInterface string
-	OutputDirectory string
-	RestfulHeader   string
-	RestfulMethod   string
-	RestfulURL      string
-	Interval        int
+	Proxy     ProxyConfig      `json:"proxy"`
+	Providers []ProviderConfig `json:"providers"`
 }
 
 var configCache = Config{
-	ConnectivityURL: "https://test.ipw.cn/",
-	FilterInterface: "",
-	OutputDirectory: "",
-	RestfulHeader:   "",
-	RestfulMethod:   "POST",
-	RestfulURL:      "",
-	Interval:        60,
+	Proxy: ProxyConfig{
+		Enable:   false,
+		Address:  "192.168.1.1",
+		Port:     8080,
+		Protocol: "HTTP",
+		Auth:     false,
+		User:     "",
+		Password: "",
+	},
+	Providers: []ProviderConfig{},
 }
 
 var configFilePath string
@@ -49,38 +79,13 @@ func ConfigGet() *Config {
 	return &configCache
 }
 
-func ConnectivityURLSave(url string) error {
-	configCache.ConnectivityURL = url
+func ProxyConfigSave(proxy ProxyConfig) error {
+	configCache.Proxy = proxy
 	return configSyncToFile()
 }
 
-func FilterInterfaceSave(filter string) error {
-	configCache.FilterInterface = filter
-	return configSyncToFile()
-}
-
-func OutputDirectorySave(dir string) error {
-	configCache.OutputDirectory = dir
-	return configSyncToFile()
-}
-
-func RestfulHeaderSave(key, value string) error {
-	configCache.RestfulHeader = fmt.Sprintf("%s:%s", key, value)
-	return configSyncToFile()
-}
-
-func RestfulMethodSave(method string) error {
-	configCache.RestfulMethod = method
-	return configSyncToFile()
-}
-
-func RestfulURLSave(url string) error {
-	configCache.RestfulURL = url
-	return configSyncToFile()
-}
-
-func IntervalSave(value int) error {
-	configCache.Interval = value
+func ProviderConfigSave(provider ProviderConfig) error {
+	configCache.Providers = append(configCache.Providers, provider)
 	return configSyncToFile()
 }
 
@@ -93,12 +98,11 @@ func ConfigInit() {
 			err := configSyncToFile()
 			if err != nil {
 				logs.Error("config sync to file fail, %s", err.Error())
-				return
 			}
 		}
 	}()
 
-	configFilePath = fmt.Sprintf("%s%c%s", ConfigDirGet(), os.PathSeparator, "config.json")
+	configFilePath = filepath.Join(ConfigDirGet(), "config.json")
 
 	_, err = os.Stat(configFilePath)
 	if err != nil {

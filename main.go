@@ -5,6 +5,5 @@ func main() {
 	LogInit()
 	IconInit()
 	ConfigInit()
-	MonitorInit()
 	mainWindows()
 }
